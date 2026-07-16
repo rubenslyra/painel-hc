@@ -1,0 +1,49 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets.*
+
+# Logs
+*.log
+logs/
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+coverage/
+.nx/
+
+# Playwright
+playwright-report/
+test-results/
+
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.nupkg
+
+# Java / Maven
+apps/api-springboot/target/
+
+# Local databases / temp
+*.db
+*.sqlite
+*.sqlite3
+.tmp/
+tmp/

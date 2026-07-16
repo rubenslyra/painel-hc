@@ -1,0 +1,78 @@
+name: Task
+description: Planejar uma etapa incremental da refatoracao do painel-hc
+title: "[fase] objetivo curto"
+labels: ["task"]
+body:
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Fase
+      options:
+        - "0 - Diagnostico"
+        - "1 - Execucao basica"
+        - "2 - Dominio do BFF"
+        - "3 - Regra de saude"
+        - "4 - ERP Mock"
+        - "5 - Persistencia local"
+        - "6 - Refit e sincronizacao"
+        - "7 - API BFF"
+        - "8 - Seguranca"
+        - "9 - Angular"
+        - "10 - Docker e CI"
+        - "11 - Deploy demo"
+        - "12 - Manual final"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area principal
+      options:
+        - web
+        - bff
+        - erp
+        - ci
+        - docs
+        - security
+        - docker
+        - repo
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo
+      description: Descreva o resultado esperado da task.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceite
+      description: Liste os criterios verificaveis para considerar a task concluida.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Comandos de validacao
+      description: Informe os comandos que devem passar.
+      value: |
+        ```powershell
+        
+        ```
+    validations:
+      required: true
+  - type: dropdown
+    id: semver
+    attributes:
+      label: Impacto SemVer previsto
+      options:
+        - none
+        - patch
+        - minor
+        - major
+    validations:
+      required: true

@@ -1,0 +1,63 @@
+databases:
+  - name: pvt-db
+    databaseName: pvt_project_panel
+    user: pvt
+    plan: free
+    ipAllowList: []
+
+services:
+  - type: web
+    name: pvt-erp-mock
+    runtime: docker
+    repo: https://github.com/rubenslyra/vaga-PVT
+    dockerfilePath: backend/erp-mock/Dockerfile
+    dockerContext: backend/erp-mock
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SERVER_PORT
+        value: "8081"
+      - key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+        value: "health,info"
+      - key: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+        value: "always"
+
+  - type: web
+    name: pvt-api
+    runtime: docker
+    repo: https://github.com/rubenslyra/vaga-PVT
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:8080
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Docker
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: ErpGateway__BaseUrl
+        value: https://pvt-erp-mock.onrender.com
+      - key: ProjectHealth__AttentionConsumptionPercentage
+        value: "80"
+      - key: ProjectHealth__AttentionProgressGap
+        value: "10"
+      - key: ProjectHealth__CriticalProgressGap
+        value: "25"
+      - key: ProjectHealth__DaysUntilDueDateAttention
+        value: "30"
+
+  - type: web
+    name: pvt-web
+    runtime: docker
+    repo: https://github.com/rubenslyra/vaga-PVT
+    dockerfilePath: web/Dockerfile
+    dockerContext: web
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "80"
+      - key: API_URL
+        value: http://pvt-api:8080

@@ -1,0 +1,8 @@
+{
+  "extends": ["@commitlint/config-conventional"],
+  "rules": {
+    "type-enum": [2, "always", ["feat", "fix", "docs", "test", "build", "ci", "chore", "refactor", "perf", "security"]],
+    "scope-enum": [2, "always", ["repo", "docs", "web", "bff", "erp", "ci", "security", "e2e", "docker", "release"]],
+    "subject-case": [0]
+  }
+}
