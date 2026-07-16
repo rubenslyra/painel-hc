@@ -1,0 +1,39 @@
+@use '@angular/material' as mat;
+
+/* ---------- Design tokens (Design "Analítico Neutro") ---------- */
+:root {
+  --bg: 0 0% 100%;
+  --surface: 220 20% 99%;
+  --muted: 220 15% 96%;
+  --border: 220 13% 91%;
+  --primary: 221 83% 53%;
+  --healthy: 152 62% 40%;
+  --attention: 38 92% 50%;
+  --critical: 0 72% 51%;
+  --text: 222 47% 11%;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { height: 100%; margin: 0; font-family: 'Inter', system-ui, sans-serif; color: hsl(var(--text)); background: hsl(var(--bg)); }
+
+/* ---------- Material M3 theme baseado em tokens ---------- */
+html { @include mat.theme((color: (primary: mat.$blue-palette, tertiary: mat.$green-palette), typography: Inter, density: 0)); }
+
+/* ---------- Mixins reutilizáveis ---------- */
+@mixin panel { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 12px; padding: 16px; }
+@mixin touch-target { min-height: 44px; min-width: 44px; }
+@mixin status-pill($h) {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+  background: hsl(#{$h} / 0.12); color: hsl(#{$h});
+  &::before { content: ''; width: 6px; height: 6px; border-radius: 999px; background: hsl(#{$h}); }
+}
+
+.status-healthy   { @include status-pill(var(--healthy)); }
+.status-attention { @include status-pill(var(--attention)); }
+.status-critical  { @include status-pill(var(--critical)); }
+.panel            { @include panel; }
+.num              { font-variant-numeric: tabular-nums; }
