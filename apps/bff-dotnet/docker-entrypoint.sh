@@ -2,17 +2,30 @@
 set -e
 
 if [ -n "$DATABASE_URL" ]; then
-  URI="${DATABASE_URL#postgres://}"
-  DB_USER="${URI%%:*}"
-  REST="${URI#*:}"
-  DB_PASS="${REST%%@*}"
-  REST="${REST#*@}"
-  DB_HOST="${REST%%:*}"
-  REST="${REST#*:}"
-  DB_PORT="${REST%%/*}"
-  DB_NAME="${REST#*/}"
-  DB_NAME="${DB_NAME%%\?*}"
-  export ConnectionStrings__Painel="Host=$DB_HOST;Port=$DB_PORT;Database=$DB_NAME;Username=$DB_USER;Password=$DB_PASS"
+  uri="${DATABASE_URL#postgres://}"
+
+  userpass="${uri%%@*}"
+  hostportdb="${uri#*@}"
+
+  user="${userpass%%:*}"
+  pass="${userpass#*:}"
+
+  hostport="${hostportdb%%/*}"
+  db="${hostportdb#*/}"
+  db="${db%%\?*}"
+
+  case "$hostport" in
+    *:*)
+      host="${hostport%%:*}"
+      port="${hostport#*:}"
+      ;;
+    *)
+      host="$hostport"
+      port="5432"
+      ;;
+  esac
+
+  export ConnectionStrings__Painel="Host=$host;Port=$port;Database=$db;Username=$user;Password=$pass"
 fi
 
 exec dotnet Painel.Bff.dll "$@"
