@@ -1,0 +1,62 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/" aria-label="Health Check Dashboard">
+      <img class="brand-logo" src="/assets/logo.svg" alt="Health Check" />
+      <span>
+        <strong>Health Check</strong>
+        <small>Projetos</small>
+      </span>
+    </a>
+
+    <nav class="side-nav" aria-label="Principal">
+      @for (item of nav; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-actions">
+      <app-notification-bell />
+      <button mat-stroked-button type="button" class="logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div>
+        <img class="topbar-logo" src="/assets/logo.svg" alt="Health Check" />
+        <span>Health Check de Projetos</span>
+      </div>
+      <div class="topbar-actions">
+        <app-notification-bell />
+        <button mat-icon-button type="button" (click)="logout()" aria-label="Sair">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Principal">
+    @for (item of nav; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>

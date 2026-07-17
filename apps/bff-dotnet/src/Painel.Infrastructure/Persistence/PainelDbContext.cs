@@ -8,11 +8,14 @@ public sealed class PainelDbContext(DbContextOptions<PainelDbContext> options) :
 {
     public DbSet<ThresholdEntity> Thresholds => Set<ThresholdEntity>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
+    public DbSet<WebhookInboxItem> WebhookInbox => Set<WebhookInboxItem>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<ThresholdEntity>().HasKey(x => x.Id);
         b.Entity<AuditEvent>().HasKey(x => x.Id);
+        b.Entity<WebhookInboxItem>().HasKey(x => x.Id);
+        b.Entity<WebhookInboxItem>().HasIndex(x => x.ExternalEventId).IsUnique();
     }
 }
 
@@ -34,6 +37,19 @@ public sealed class AuditEvent
     public string Entity { get; set; } = "";
     public string EntityId { get; set; } = "";
     public string? Payload { get; set; }
+}
+
+public sealed class WebhookInboxItem
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string ExternalEventId { get; set; } = "";
+    public string Source { get; set; } = "RM";
+    public string Type { get; set; } = "";
+    public string ProjectId { get; set; } = "";
+    public DateTimeOffset OccurredAt { get; set; }
+    public DateTimeOffset ReceivedAt { get; set; } = DateTimeOffset.UtcNow;
+    public string Status { get; set; } = "Pending";
+    public string Payload { get; set; } = "";
 }
 
 public sealed class EfThresholdRepository(PainelDbContext db) : IThresholdRepository

@@ -1,0 +1,5 @@
+{
+  "apiBaseUrl": "${API_BASE_URL}",
+  "erpBaseUrl": "${ERP_BASE_URL}",
+  "syncPollingMs": ${SYNC_POLLING_MS}
+}

@@ -1,0 +1,70 @@
+@if (data(); as data) {
+  <app-page-header
+    eyebrow="Projeto"
+    [title]="data.summary.name"
+    [subtitle]="data.summary.clientName + ' · ' + data.summary.externalId">
+    <a mat-stroked-button routerLink="/">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </a>
+  </app-page-header>
+
+  <section class="summary-grid" aria-label="Indicadores do projeto">
+    <article class="summary-card">
+      <span>Status</span>
+      <app-status-chip [status]="data.summary.indicators.status" />
+    </article>
+    <article class="summary-card">
+      <span>Consumo</span>
+      <strong class="num">{{ data.summary.indicators.consumptionPercentage }}%</strong>
+    </article>
+    <article class="summary-card">
+      <span>Avanço físico</span>
+      <strong class="num">{{ data.summary.physicalProgressPercentage }}%</strong>
+    </article>
+    <article class="summary-card">
+      <span>Saldo contratual</span>
+      <strong class="num">{{ data.summary.indicators.remainingHours }} h</strong>
+    </article>
+  </section>
+
+  <section class="detail-grid">
+    <article class="panel-section">
+      <header>
+        <h2>Equipe</h2>
+        <span class="num">{{ data.analysts.length }}</span>
+      </header>
+      <div class="list">
+        @for (analyst of data.analysts; track analyst.id) {
+          <div class="list-row analyst-row">
+            <div class="row-main">
+              <strong>{{ analyst.name }} · {{ analyst.role }}</strong>
+              <span>{{ analyst.email }}</span>
+            </div>
+            <span class="num allocation">{{ analyst.allocationPercentage }}%</span>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="panel-section">
+      <header>
+        <h2>Apontamentos recentes</h2>
+        <span class="num">{{ data.recentEntries.length }}</span>
+      </header>
+      <div class="list">
+        @for (entry of data.recentEntries; track entry.id) {
+          <div class="list-row entry-row">
+            <div class="row-main">
+              <strong>{{ entry.description }}</strong>
+              <span>{{ entry.workDate }} · {{ entry.analystName }} · {{ entry.source }}</span>
+            </div>
+            <span class="num hours">{{ entry.hours }} h</span>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+} @else {
+  <app-loading-splash label="Carregando projeto" />
+}

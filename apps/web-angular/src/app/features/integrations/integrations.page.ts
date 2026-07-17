@@ -1,23 +1,33 @@
 import { Component, inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { runtimeConfig, saveRuntimeConfig } from '@app/core/config/runtime-config';
 import { SyncService } from '@app/core/adapters/sync.service';
+import { PageHeaderComponent } from '@app/shared/ui/page-header.component';
 
 @Component({
   selector: 'app-integrations',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatProgressBarModule],
-  template: `
-    <h1 class="text-xl md:text-2xl font-semibold mb-4">Integrações · TOTVS RM</h1>
-    <div class="panel">
-      <div class="flex items-center gap-3">
-        <button mat-flat-button color="primary" (click)="sync.start()" [disabled]="sync.state().phase === 'running'"><mat-icon>sync</mat-icon>Sincronizar agora</button>
-        <span class="text-sm">{{ sync.state().step }}</span>
-      </div>
-      @if (sync.state().phase === 'running') { <mat-progress-bar mode="determinate" [value]="sync.state().progress" class="mt-3"></mat-progress-bar> }
-      @if (sync.state().finishedAt) { <p class="text-xs text-muted-foreground mt-3">Última execução: {{ sync.state().finishedAt }} · {{ sync.state().updated }} atualizados, {{ sync.state().imported }} importados</p> }
-    </div>
-  `
+  imports: [ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressBarModule, PageHeaderComponent],
+  templateUrl: './integrations.page.html',
+  styleUrl: './integrations.page.scss'
 })
-export class IntegrationsPage { sync = inject(SyncService); }
+export class IntegrationsPage {
+  sync = inject(SyncService);
+  private fb = inject(FormBuilder);
+
+  form = this.fb.nonNullable.group({
+    apiBaseUrl: [runtimeConfig.apiBaseUrl, [Validators.required]],
+    erpBaseUrl: [runtimeConfig.erpBaseUrl, [Validators.required]]
+  });
+
+  saveUrls(): void {
+    if (this.form.invalid) return;
+    saveRuntimeConfig(this.form.getRawValue());
+    this.sync.refreshPending();
+  }
+}

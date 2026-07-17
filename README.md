@@ -58,6 +58,117 @@ apps/
 └── web-angular/      # SPA: Angular 20 + Angular Material + Tailwind
 ```
 
+## Como Rodar a Stack Local
+
+Este é o fluxo mais simples para avaliadores rodarem a aplicação inteira em ambiente local.
+
+### Pré-requisitos
+
+- Java 21.
+- .NET SDK 10.
+- Node.js 20.19.0 ou superior.
+- PowerShell, Bash ou terminal equivalente.
+
+Não é obrigatório subir PostgreSQL para teste local. Em `Development`, se a connection string do BFF estiver vazia, o BFF usa banco em memória.
+
+### Portas usadas
+
+| App | Porta | URL |
+| --- | --- | --- |
+| ERP Mock Spring Boot | `18082` | `http://localhost:18082/swagger` |
+| BFF .NET | `5080` | `http://localhost:5080/swagger` |
+| Angular | `4200` | `http://localhost:4200` |
+
+### 1. Subir e manter rodando a API externa Spring Boot
+
+Esta aplicação é o **ERP Mock**, ou seja, a API externa simulada que o BFF consulta via HTTP. Ela precisa ficar rodando durante todo o teste local.
+
+Abra o primeiro terminal na raiz do repositório e execute:
+
+```powershell
+cd apps/api-springboot
+.\mvnw.cmd spring-boot:run
+```
+
+Em Linux/macOS:
+
+```bash
+cd apps/api-springboot
+./mvnw spring-boot:run
+```
+
+Deixe esse terminal aberto. Quando a aplicação estiver pronta, o log deve indicar que o Tomcat iniciou na porta `18082`. Não feche esse terminal enquanto estiver usando o BFF ou o Angular. Enquanto a API estiver rodando, o comando não volta para o prompt; isso é esperado.
+
+Verifique no navegador:
+
+```text
+http://localhost:18082/swagger
+http://localhost:18082/actuator/health
+```
+
+Se `http://localhost:18082/actuator/health` responder `UP`, a API externa está pronta para o BFF consumir.
+
+### 2. Subir o BFF
+
+Abra outro terminal na raiz do repositório:
+
+```powershell
+cd apps/bff-dotnet
+dotnet restore Painel.sln
+dotnet run --project src/Painel.Bff
+```
+
+Verifique se respondeu:
+
+```text
+http://localhost:5080/swagger
+```
+
+O BFF busca os dados do ERP Mock em `http://localhost:18082`. Por isso, deixe o Spring Boot rodando antes de abrir o dashboard.
+
+### 3. Subir o Angular
+
+Abra um terceiro terminal na raiz do repositório:
+
+```powershell
+cd apps/web-angular
+npm ci
+npm start
+```
+
+Acesse:
+
+```text
+http://localhost:4200
+```
+
+Login local:
+
+```text
+Usuário: demo
+Senha: demo
+```
+
+O login é mockado para desenvolvimento. Qualquer usuário não vazio com senha de pelo menos 4 caracteres também passa.
+
+### Checklist rápido
+
+Antes de abrir o Angular, confirme:
+
+- `http://localhost:18082/actuator/health` retorna o health do ERP Mock.
+- `http://localhost:5080/swagger` abre o Swagger do BFF.
+- O terminal do BFF não mostra erro de conexão com `localhost:18082`.
+
+### Problemas comuns
+
+- Spring Boot falhou com `Port 18082 was already in use`: já existe outro processo usando a porta da API externa. No Windows, descubra o PID com `netstat -ano | findstr :18082`, confira com `Get-Process -Id <PID>` e pare o processo se for uma instância antiga da própria API. Depois rode `.\mvnw.cmd spring-boot:run` novamente.
+- Porta ocupada em outra app: encerre o processo que está usando `5080` ou `4200`, ou ajuste a porta na configuração da app correspondente.
+- Dashboard vazio ou erro no Angular: confirme que o ERP Mock e o BFF estão rodando. O Angular chama somente o BFF.
+- Erro de CORS: use `http://localhost:4200`; esta origem já está liberada no BFF.
+- Erro no `npm ci`: remova `node_modules` e garanta que a versão do Node seja 20.19.0 ou superior.
+- Erro de Java: confirme `java -version` apontando para Java 21.
+- Erro de .NET: confirme `dotnet --version` com SDK 10 instalado.
+
 ## Regras Arquiteturais
 
 - O Angular chama apenas o BFF.
@@ -113,7 +224,7 @@ dotnet test Painel.sln -c Release --no-build
 
 Resultado: build com sucesso e **10 testes aprovados**.
 
-## Como Validar a Fase Atual
+## Como Validar Build e Testes
 
 ### Spring Boot
 

@@ -1,0 +1,100 @@
+<app-page-header
+  eyebrow="Dashboard"
+  title="Portfólio de projetos"
+  subtitle="Indicadores consolidados de consumo, avanço físico e saldo contratual.">
+  <button mat-stroked-button type="button" (click)="export()" [disabled]="!projectList().length">
+    <mat-icon>download</mat-icon>
+    CSV
+  </button>
+</app-page-header>
+
+<section class="metrics" aria-label="Resumo do portfólio">
+  <article class="metric-card">
+    <span>Total</span>
+    <strong class="num">{{ total() }}</strong>
+  </article>
+  <article class="metric-card healthy">
+    <span>Saudáveis</span>
+    <strong class="num">{{ healthy() }}</strong>
+  </article>
+  <article class="metric-card attention">
+    <span>Atenção</span>
+    <strong class="num">{{ attention() }}</strong>
+  </article>
+  <article class="metric-card critical">
+    <span>Críticos</span>
+    <strong class="num">{{ critical() }}</strong>
+  </article>
+</section>
+
+@if (loading()) {
+  <app-loading-splash label="Carregando projetos" />
+} @else if (projectList().length) {
+  <section class="table-panel" aria-label="Projetos">
+    <table mat-table [dataSource]="projectList()" class="projects-table">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Projeto</th>
+        <td mat-cell *matCellDef="let project">
+          <a [routerLink]="['/projects', project.id]" class="project-link">
+            <strong>{{ project.name }}</strong>
+            <span>{{ project.clientName }} · {{ project.externalId }}</span>
+          </a>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let project">
+          <app-status-chip [status]="project.indicators.status" />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="consumption">
+        <th mat-header-cell *matHeaderCellDef class="numeric">Consumo</th>
+        <td mat-cell *matCellDef="let project" class="numeric num">{{ project.indicators.consumptionPercentage }}%</td>
+      </ng-container>
+
+      <ng-container matColumnDef="progress">
+        <th mat-header-cell *matHeaderCellDef class="numeric">Avanço</th>
+        <td mat-cell *matCellDef="let project" class="numeric num">{{ project.physicalProgressPercentage }}%</td>
+      </ng-container>
+
+      <ng-container matColumnDef="remaining">
+        <th mat-header-cell *matHeaderCellDef class="numeric">Saldo</th>
+        <td mat-cell *matCellDef="let project" class="numeric num">{{ project.indicators.remainingHours }} h</td>
+      </ng-container>
+
+      <ng-container matColumnDef="deadline">
+        <th mat-header-cell *matHeaderCellDef>Prazo</th>
+        <td mat-cell *matCellDef="let project" class="num">{{ project.expectedEndDate }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="cols"></tr>
+      <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+    </table>
+  </section>
+
+  <section class="mobile-list" aria-label="Projetos">
+    @for (project of projectList(); track project.id) {
+      <a [routerLink]="['/projects', project.id]" class="project-card">
+        <div class="card-heading">
+          <div>
+            <strong>{{ project.name }}</strong>
+            <span>{{ project.clientName }}</span>
+          </div>
+          <app-status-chip [status]="project.indicators.status" />
+        </div>
+        <dl>
+          <div><dt>Consumo</dt><dd class="num">{{ project.indicators.consumptionPercentage }}%</dd></div>
+          <div><dt>Avanço</dt><dd class="num">{{ project.physicalProgressPercentage }}%</dd></div>
+          <div><dt>Saldo</dt><dd class="num">{{ project.indicators.remainingHours }} h</dd></div>
+        </dl>
+      </a>
+    }
+  </section>
+} @else {
+  <section class="empty-state">
+    <mat-icon>folder_open</mat-icon>
+    <p>Nenhum projeto disponível.</p>
+  </section>
+}

@@ -1,0 +1,43 @@
+<svg width="980" height="260" viewBox="0 0 980 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hcpGradient" x1="40" y1="30" x2="190" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F4C5C"></stop>
+      <stop offset="1" stop-color="#1F7A8C"></stop>
+    </linearGradient>
+    <linearGradient id="checkGradient" x1="80" y1="90" x2="170" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22C55E"></stop>
+      <stop offset="1" stop-color="#16A34A"></stop>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="240" height="240" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.12"></feDropShadow>
+    </filter>
+  </defs>
+
+  <!-- Icon container -->
+  <g filter="url(#shadow)">
+    <rect x="28" y="28" width="180" height="180" rx="36" fill="url(#hcpGradient)"></rect>
+  </g>
+
+  <!-- Bars -->
+  <rect x="68" y="126" width="18" height="42" rx="6" fill="#D7EEF3" opacity="0.95"></rect>
+  <rect x="100" y="106" width="18" height="62" rx="6" fill="#D7EEF3" opacity="0.95"></rect>
+  <rect x="132" y="84" width="18" height="84" rx="6" fill="#D7EEF3" opacity="0.95"></rect>
+
+  <!-- Check line -->
+  <path d="M73 104L96 127L165 76" stroke="url(#checkGradient)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+
+  <!-- Wordmark -->
+  <text x="250" y="112" font-family="Inter, Arial, Helvetica, sans-serif" font-size="78" font-weight="800" fill="#0F172A" letter-spacing="1.5">
+    HCP
+  </text>
+
+  <text x="252" y="156" font-family="Inter, Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="#1F7A8C" letter-spacing="0.8">
+    Health Check Projects
+  </text>
+
+  <line x1="252" y1="176" x2="660" y2="176" stroke="#E2E8F0" stroke-width="2"></line>
+
+  <text x="252" y="208" font-family="Inter, Arial, Helvetica, sans-serif" font-size="20" font-weight="500" fill="#475569" letter-spacing="0.4">
+    Project Health Dashboard
+  </text>
+</svg>

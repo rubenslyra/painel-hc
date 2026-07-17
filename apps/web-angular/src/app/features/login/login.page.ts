@@ -1,37 +1,49 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '@app/core/auth/auth.service';
+import { LoadingSplashComponent } from '@app/shared/ui/loading-splash.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
-  template: `
-  <div class="min-h-screen grid place-items-center bg-muted p-4">
-    <form class="panel w-full max-w-sm flex flex-col gap-4" (submit)="submit($event)">
-      <h1 class="text-xl font-semibold">Entrar no HC</h1>
-      <mat-form-field appearance="outline"><mat-label>Usuário</mat-label><input matInput name="u" [(ngModel)]="username" required /></mat-form-field>
-      <mat-form-field appearance="outline"><mat-label>Senha</mat-label><input matInput type="password" name="p" [(ngModel)]="password" required minlength="4" /></mat-form-field>
-      @if (error()) { <p class="text-critical text-sm">{{ error() }}</p> }
-      <button mat-flat-button color="primary" [disabled]="loading()">{{ loading() ? 'Entrando…' : 'Entrar' }}</button>
-    </form>
-  </div>`
+  imports: [ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, LoadingSplashComponent],
+  templateUrl: './login.page.html',
+  styleUrl: './login.page.scss'
 })
 export class LoginPage {
   private auth = inject(AuthService);
+  private fb = inject(FormBuilder);
   private router = inject(Router);
-  username = 'demo'; password = 'demo';
-  loading = signal(false); error = signal<string | null>(null);
 
-  async submit(ev: Event) {
-    ev.preventDefault();
-    this.loading.set(true); this.error.set(null);
-    try { await this.auth.login({ username: this.username, password: this.password }); this.router.navigate(['/']); }
-    catch { this.error.set('Credenciais inválidas'); }
-    finally { this.loading.set(false); }
+  loading = signal(false);
+  error = signal<string | null>(null);
+  hidePassword = signal(true);
+
+  form = this.fb.nonNullable.group({
+    username: ['demo', [Validators.required]],
+    password: ['demo', [Validators.required, Validators.minLength(4)]]
+  });
+
+  canSubmit = computed(() => this.form.valid && !this.loading());
+
+  async submit(): Promise<void> {
+    this.form.markAllAsTouched();
+    if (!this.form.valid || this.loading()) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      await this.auth.login(this.form.getRawValue());
+      await this.router.navigate(['/']);
+    } catch {
+      this.error.set('Usuário ou senha inválidos.');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

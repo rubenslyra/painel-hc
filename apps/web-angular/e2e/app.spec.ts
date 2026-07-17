@@ -29,6 +29,8 @@ async function mockApi(page: Page): Promise<void> {
   await page.route('**/api/v1/auth/login', route => route.fulfill({ json: authTokens }));
   await page.route('**/api/v1/auth/refresh', route => route.fulfill({ json: authTokens }));
   await page.route('**/api/v1/auth/logout', route => route.fulfill({ status: 204 }));
+  await page.route('**/api/v1/erp-webhooks/pending-count', route => route.fulfill({ json: { count: 2, lastReceivedAt: '2026-07-16T14:30:00Z' } }));
+  await page.route('**/api/v1/erp-webhooks/acknowledge', route => route.fulfill({ json: { count: 0, lastReceivedAt: null } }));
   await page.route('**/api/v1/projects/p1', route => route.fulfill({
     json: {
       summary: project,
@@ -74,3 +76,4 @@ test('navegacao autenticada entre paginas principais', async ({ page }) => {
   await page.getByRole('link', { name: /configura/i }).first().click();
   await expect(page).toHaveURL(/settings/);
 });
+

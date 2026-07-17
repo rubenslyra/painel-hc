@@ -1,7 +1,7 @@
 /** Contratos TypeScript espelhando os DTOs do BFF (.NET). Fonte única de verdade tipada.
  *  Em produção, regenerar via `openapi-generator` a partir do Swagger do BFF. */
 
-export type ProjectStatus = 'Healthy' | 'Attention' | 'Critical';
+export type ProjectStatus = 'Healthy' | 'Attention' | 'Critical' | 'Inconsistent';
 
 export interface ProjectIndicators {
   workedHours: number;
@@ -42,5 +42,11 @@ export interface AuthTokens { accessToken: string; refreshToken: string; expires
 export interface LoginRequest { username: string; password: string; }
 
 export const STATUS_LABEL: Record<ProjectStatus, string> = {
-  Healthy: 'Saudável', Attention: 'Atenção', Critical: 'Crítico'
+  Healthy: 'Saudável',
+  Attention: 'Atenção',
+  Critical: 'Crítico',
+  Inconsistent: 'Inconsistente'
 };
+
+export interface WebhookPendingCount { count: number; lastReceivedAt?: string | null; }
+

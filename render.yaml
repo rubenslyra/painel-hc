@@ -1,6 +1,6 @@
 databases:
   - name: pvt-db
-    databaseName: pvt_project_panel
+    databaseName: painel_hc
     user: pvt
     plan: free
     ipAllowList: []
@@ -9,25 +9,33 @@ services:
   - type: web
     name: pvt-erp-mock
     runtime: docker
-    repo: https://github.com/rubenslyra/vaga-PVT
-    dockerfilePath: backend/erp-mock/Dockerfile
-    dockerContext: backend/erp-mock
+    repo: https://github.com/rubenslyra/painel-hc
+    branch: main
+    dockerfilePath: apps/api-springboot/Dockerfile
+    dockerContext: apps/api-springboot
     plan: free
     healthCheckPath: /actuator/health
     envVars:
       - key: SERVER_PORT
-        value: "8081"
+        value: "18082"
       - key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
         value: "health,info"
       - key: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
         value: "always"
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:h2:mem:rm_mock;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+      - key: SPRING_DATASOURCE_USERNAME
+        value: sa
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: ""
 
   - type: web
     name: pvt-api
     runtime: docker
-    repo: https://github.com/rubenslyra/vaga-PVT
-    dockerfilePath: backend/Dockerfile
-    dockerContext: backend
+    repo: https://github.com/rubenslyra/painel-hc
+    branch: main
+    dockerfilePath: apps/bff-dotnet/Dockerfile
+    dockerContext: apps/bff-dotnet
     plan: free
     healthCheckPath: /health
     envVars:
@@ -35,9 +43,13 @@ services:
         value: http://0.0.0.0:8080
       - key: ASPNETCORE_ENVIRONMENT
         value: Docker
-      - key: ConnectionStrings__DefaultConnection
-        sync: false
-      - key: ErpGateway__BaseUrl
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pvt-db
+          property: connectionString
+      - key: Cors__Origins__0
+        value: https://pvt-web.onrender.com
+      - key: Erp__BaseUrl
         value: https://pvt-erp-mock.onrender.com
       - key: ProjectHealth__AttentionConsumptionPercentage
         value: "80"
@@ -51,13 +63,14 @@ services:
   - type: web
     name: pvt-web
     runtime: docker
-    repo: https://github.com/rubenslyra/vaga-PVT
-    dockerfilePath: web/Dockerfile
-    dockerContext: web
+    repo: https://github.com/rubenslyra/painel-hc
+    branch: main
+    dockerfilePath: apps/web-angular/Dockerfile
+    dockerContext: apps/web-angular
     plan: free
     healthCheckPath: /
     envVars:
       - key: PORT
         value: "80"
-      - key: API_URL
-        value: http://pvt-api:8080
+      - key: API_BASE_URL
+        value: https://pvt-api.onrender.com/api/v1

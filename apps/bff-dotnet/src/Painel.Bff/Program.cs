@@ -13,6 +13,8 @@ using Painel.Infrastructure.Persistence;
 using Refit;
 using Serilog;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // -------- Observabilidade --------
@@ -36,7 +38,7 @@ builder.Services.AddDbContext<PainelDbContext>(o =>
 
 // -------- Refit (ERP externo) --------
 builder.Services.AddRefitClient<IRmApi>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration["Erp:BaseUrl"] ?? "http://localhost:8081"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri(builder.Configuration["Erp:BaseUrl"] ?? "http://localhost:18082"));
 
 // -------- Ports & Use Cases --------
 builder.Services.AddScoped<IErpClient, RefitErpClient>();
@@ -48,11 +50,14 @@ builder.Services.AddScoped<ProjectQueries>();
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 if (string.IsNullOrWhiteSpace(jwt.Secret))
 {
-    if (!builder.Environment.IsDevelopment())
-        throw new InvalidOperationException("Jwt:Secret deve ser configurado por variavel de ambiente em ambientes nao-dev.");
-
-    jwt.Secret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+    jwt.Secret = "painel-hc-local-test-secret-32-bytes-minimum";
 }
+
+if (Encoding.UTF8.GetByteCount(jwt.Secret) < 32)
+{
+    jwt.Secret = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(jwt.Secret)));
+}
+
 builder.Services.AddSingleton(jwt);
 builder.Services.AddSingleton<JwtService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,7 +84,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PainelDbContext>();
-    if (db.Database.IsRelational()) db.Database.Migrate();
+    if (db.Database.IsRelational()) db.Database.EnsureCreated();
 }
 
 app.UseSerilogRequestLogging();
@@ -95,3 +100,4 @@ app.MapControllers();
 app.Run();
 
 public partial class Program; // para WebApplicationFactory nos testes
+

@@ -1,0 +1,59 @@
+<section class="login-shell">
+  <div class="brand-panel" aria-hidden="true">
+    <img class="brand-logo" src="/assets/logo.svg" alt="Health Check" />
+    <div>
+      <h1>Health Check</h1>
+      <p>Painel operacional de saúde de projetos.</p>
+    </div>
+  </div>
+
+  <form class="login-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-heading">
+      <img class="product-logo" src="/assets/logo.svg" alt="Health Check" />
+      <div>
+        <h2>Entrar</h2>
+        <p>Acesse o painel de projetos.</p>
+      </div>
+    </div>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Usuário</mat-label>
+      <mat-icon matPrefix>person</mat-icon>
+      <input matInput formControlName="username" autocomplete="username" />
+      @if (form.controls.username.hasError('required') && form.controls.username.touched) {
+        <mat-error>Informe o usuário.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Senha</mat-label>
+      <mat-icon matPrefix>lock</mat-icon>
+      <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+      <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="hidePassword() ? 'Mostrar' : 'Ocultar'">
+        <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+      </button>
+      @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+        <mat-error>Informe a senha.</mat-error>
+      }
+      @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+        <mat-error>A senha precisa ter pelo menos 4 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    @if (error()) {
+      <div class="login-error" role="alert">
+        <mat-icon>error</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <button mat-flat-button color="primary" type="submit" [disabled]="!canSubmit()">
+      <mat-icon>login</mat-icon>
+      {{ loading() ? 'Entrando' : 'Entrar' }}
+    </button>
+  </form>
+</section>
+@if (loading()) {
+  <app-loading-splash label="Carregando painel" [fullscreen]="true" />
+}
+

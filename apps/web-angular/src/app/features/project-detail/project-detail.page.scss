@@ -1,0 +1,137 @@
+.summary-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.summary-card,
+.panel-section {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+}
+
+.summary-card {
+  display: grid;
+  gap: 0.5rem;
+  min-height: 5rem;
+  min-width: 0;
+  padding: 0.875rem;
+}
+
+.summary-card span,
+.panel-section header span,
+.row-main span {
+  color: hsl(var(--muted-text));
+  font-size: 0.8125rem;
+}
+
+.summary-card strong {
+  font-size: 1.35rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel-section {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panel-section header {
+  align-items: center;
+  border-bottom: 1px solid hsl(var(--border));
+  display: flex;
+  justify-content: space-between;
+  min-height: 3.25rem;
+  padding: 0 0.875rem;
+}
+
+.panel-section h2 {
+  font-size: 1rem;
+  font-weight: 720;
+  margin: 0;
+}
+
+.list {
+  display: grid;
+}
+
+.list-row {
+  align-items: start;
+  display: grid;
+  gap: 0.625rem;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 4rem;
+  padding: 0.875rem;
+}
+
+.list-row + .list-row {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.row-main {
+  min-width: 0;
+}
+
+.row-main strong,
+.row-main span {
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.row-main strong {
+  color: hsl(var(--text));
+  font-size: 0.925rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.row-main span {
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.allocation,
+.hours {
+  align-self: start;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+  color: hsl(var(--text));
+  font-weight: 720;
+  justify-self: start;
+  padding: 0.25rem 0.5rem;
+}
+
+@media (min-width: 700px) {
+  .summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .list-row {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0.875rem 1rem;
+  }
+
+  .allocation,
+  .hours {
+    justify-self: end;
+  }
+}
+
+@media (min-width: 980px) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+}

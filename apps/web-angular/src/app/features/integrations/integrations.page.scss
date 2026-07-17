@@ -1,0 +1,120 @@
+.config-panel,
+.pending-alert {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.config-panel {
+  align-items: start;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  padding: 1rem;
+}
+
+.config-panel button {
+  min-height: 3.5rem;
+}
+
+.pending-alert {
+  align-items: center;
+  border-color: hsl(var(--attention) / 0.4);
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.pending-alert mat-icon {
+  color: hsl(32 95% 32%);
+}
+
+.pending-alert strong,
+.pending-alert span {
+  display: block;
+}
+
+.pending-alert span {
+  color: hsl(var(--muted-text));
+  font-size: 0.8125rem;
+}
+.sync-panel {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.sync-status {
+  align-items: center;
+  display: flex;
+  gap: 0.875rem;
+}
+
+.status-icon {
+  align-items: center;
+  background: hsl(var(--muted));
+  border-radius: 8px;
+  color: hsl(var(--muted-text));
+  display: flex;
+  flex: 0 0 2.75rem;
+  height: 2.75rem;
+  justify-content: center;
+}
+
+.status-icon.running {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary-strong));
+}
+
+.status-icon.success {
+  background: hsl(var(--healthy) / 0.12);
+  color: hsl(var(--healthy));
+}
+
+.sync-status strong,
+.sync-status span {
+  display: block;
+}
+
+.sync-status span,
+.finished-at,
+.sync-metrics span {
+  color: hsl(var(--muted-text));
+  font-size: 0.8125rem;
+}
+
+.sync-metrics {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sync-metrics article {
+  background: hsl(var(--bg));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 0.875rem;
+}
+
+.sync-metrics strong {
+  display: block;
+  font-size: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.finished-at {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .config-panel,
+  .sync-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+

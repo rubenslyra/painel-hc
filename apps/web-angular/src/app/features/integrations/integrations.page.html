@@ -1,0 +1,60 @@
+<app-page-header
+  eyebrow="Integrações"
+  title="ERP Mock"
+  subtitle="Execução manual da rotina de sincronização e acompanhamento de progresso.">
+  <button mat-flat-button color="primary" type="button" (click)="sync.start()" [disabled]="sync.state().phase === 'running'">
+    <mat-icon>sync</mat-icon>
+    Sincronizar
+  </button>
+</app-page-header>
+
+<section class="config-panel" [formGroup]="form" aria-label="Configuração das integrações">
+  <mat-form-field appearance="outline">
+    <mat-label>API consumida pelo frontend</mat-label>
+    <input matInput formControlName="apiBaseUrl" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Fonte externa ERP Mock</mat-label>
+    <input matInput formControlName="erpBaseUrl" autocomplete="off" />
+  </mat-form-field>
+
+  <button mat-stroked-button type="button" (click)="saveUrls()" [disabled]="form.invalid">
+    <mat-icon>save</mat-icon>
+    Aplicar URLs
+  </button>
+</section>
+
+@if (sync.pendingCount() > 0) {
+  <section class="pending-alert" aria-live="polite">
+    <mat-icon>notifications_active</mat-icon>
+    <div>
+      <strong class="num">{{ sync.pendingCount() }}</strong>
+      <span>dados novos disponíveis para sincronizar</span>
+    </div>
+  </section>
+}
+
+<section class="sync-panel">
+  <div class="sync-status">
+    <div class="status-icon" [class.running]="sync.state().phase === 'running'" [class.success]="sync.state().phase === 'success'">
+      <mat-icon>{{ sync.state().phase === 'success' ? 'check' : 'sync_alt' }}</mat-icon>
+    </div>
+    <div>
+      <strong>{{ sync.state().step }}</strong>
+      <span>Fonte externa: {{ form.controls.erpBaseUrl.value }}</span>
+    </div>
+  </div>
+
+  <mat-progress-bar mode="determinate" [value]="sync.state().progress"></mat-progress-bar>
+
+  <div class="sync-metrics">
+    <article><span>Importados</span><strong class="num">{{ sync.state().imported }}</strong></article>
+    <article><span>Atualizados</span><strong class="num">{{ sync.state().updated }}</strong></article>
+    <article><span>Falhas</span><strong class="num">{{ sync.state().failed }}</strong></article>
+  </div>
+
+  @if (sync.state().finishedAt) {
+    <p class="finished-at">Última execução: {{ sync.state().finishedAt }}</p>
+  }
+</section>

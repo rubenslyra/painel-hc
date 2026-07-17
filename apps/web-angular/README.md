@@ -5,11 +5,32 @@ hexagonal alinhada ao BFF .NET 10.
 
 ## Rodar
 
-```bash
-npm install
-npm start          # http://localhost:4200
-npm test           # unit (Karma/Jasmine)
-npm run e2e        # e2e (Playwright — desktop + mobile)
+Antes de subir o Angular, deixe rodando:
+
+- ERP Mock: `http://localhost:18082`
+- BFF: `http://localhost:5080`
+
+```powershell
+npm ci
+npm start
+```
+
+Acesse `http://localhost:4200`.
+
+Login local:
+
+```text
+Usuário: demo
+Senha: demo
+```
+
+Para validar build e testes:
+
+```powershell
+npm run lint
+npm test
+npm run build
+npm run e2e
 ```
 
 ## Estrutura
