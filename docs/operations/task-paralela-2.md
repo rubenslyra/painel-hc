@@ -49,8 +49,26 @@ Cada app com seu `.dockerignore` excluindo `target/`, `bin/`, `obj/`, `node_modu
 - `project-detail.png` (44 KB)
 - `integrations.png` (55 KB)
 
+### 8. Correções no deploy (Render — 3 tentativas)
+
+| # | Erro | Causa | Fix | Commit |
+|---|---|---|---|---|
+| 1 | `tests/Painel.Tests.csproj not found` | Dockerfile copiava só `src/`, mas `.sln` referencia `tests/` | Restore/publish pelo `.csproj` direto | `527febc` |
+| 2 | `Couldn't set port — input string 'dpg-...'` | `DATABASE_URL` sem porta explícita; script antigo não tratava fallback | Case robusto com fallback `port=5432` | `47c2888` |
+| 3 | `password auth failed for user "postgresql"` + `libgssapi_krb5.so.2` | Render usa `postgresql://` (não `postgres://`); lib krb5 ausente na imagem `aspnet:10.0` | `#*://` no parsing + `apt-get install libgssapi-krb5-2` | `4b0d19e` |
+
+### 9. docker-compose para dev local
+
+`docker-compose.yml` na raiz — sobe `painel-hc-db` (PostgreSQL 16 Alpine) com:
+- Usuário `painel` / senha `painel`
+- DBs: `painel_hc` (padrão), `painel_hc_bff` (BFF), `painel_hc_rm` (ERP Mock)
+- Init script em `docker/postgres/init/01-create-dbs.sql`
+
+Uso: `docker compose up -d painel-hc-db`
+
 ## Decisões técnicas
 
 - **H2 no ERP Mock**: scope alterado de `test` para `runtime` — mock não precisa de persistência externa
 - **app-config.json com heredoc**: em vez de `envsubst`, o entrypoint gera o JSON inteiro, evitando dependência de `gettext` na imagem nginx
-- **BFF entrypoint**: parseia `DATABASE_URL` (formato URI) para connection string Npgsql (formato chave-valor), compatível com Render
+- **BFF entrypoint**: parseia `DATABASE_URL` com `#*://` para suportar ambos os schemes (`postgres://` e `postgresql://`)
+- **libgssapi-krb5-2**: necessária porque o driver Npgsql tenta carregar GSSAPI mesmo sem configurar; a imagem `aspnet` não a inclui
