@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$DATABASE_URL" ]; then
-  uri="${DATABASE_URL#postgres://}"
+  uri="${DATABASE_URL#*://}"
 
   userpass="${uri%%@*}"
   hostportdb="${uri#*@}"

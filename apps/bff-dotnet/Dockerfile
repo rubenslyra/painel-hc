@@ -5,6 +5,7 @@ RUN dotnet restore src/Painel.Bff/Painel.Bff.csproj
 RUN dotnet publish src/Painel.Bff/Painel.Bff.csproj -c Release -o /publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /publish .
 COPY docker-entrypoint.sh /usr/local/bin/
