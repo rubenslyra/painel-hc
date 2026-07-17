@@ -1,8 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS builder
 WORKDIR /app
-COPY Painel.sln .
 COPY src/ src/
-RUN dotnet restore Painel.sln
+RUN dotnet restore src/Painel.Bff/Painel.Bff.csproj
 RUN dotnet publish src/Painel.Bff/Painel.Bff.csproj -c Release -o /publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
