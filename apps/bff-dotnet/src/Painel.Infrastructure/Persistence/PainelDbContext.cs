@@ -9,14 +9,67 @@ public sealed class PainelDbContext(DbContextOptions<PainelDbContext> options) :
     public DbSet<ThresholdEntity> Thresholds => Set<ThresholdEntity>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
     public DbSet<WebhookInboxItem> WebhookInbox => Set<WebhookInboxItem>();
+    public DbSet<ProjectEntity> Projects => Set<ProjectEntity>();
+    public DbSet<AnalystEntity> Analysts => Set<AnalystEntity>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<ThresholdEntity>().HasKey(x => x.Id);
-        b.Entity<AuditEvent>().HasKey(x => x.Id);
-        b.Entity<WebhookInboxItem>().HasKey(x => x.Id);
-        b.Entity<WebhookInboxItem>().HasIndex(x => x.ExternalEventId).IsUnique();
+
+        b.Entity<AuditEvent>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.At);
+        });
+
+        b.Entity<WebhookInboxItem>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.ExternalEventId).IsUnique();
+        });
+
+        b.Entity<ProjectEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.ExternalId);
+            e.HasMany(x => x.Analysts).WithOne(x => x.Project).HasForeignKey(x => x.ProjectId);
+        });
+
+        b.Entity<AnalystEntity>(e =>
+        {
+            e.HasKey(x => new { x.Id, x.ProjectId });
+        });
     }
+}
+
+public sealed class ProjectEntity
+{
+    public string Id { get; set; } = "";
+    public string ExternalId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string ClientId { get; set; } = "";
+    public string ClientName { get; set; } = "";
+    public decimal SoldHours { get; set; }
+    public decimal PlannedHours { get; set; }
+    public decimal WorkedHours { get; set; }
+    public decimal PhysicalProgressPercentage { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly ExpectedEndDate { get; set; }
+    public DateTimeOffset LastSynchronizedAt { get; set; }
+    public string LifecycleStatus { get; set; } = "InProgress";
+    public ICollection<AnalystEntity> Analysts { get; set; } = [];
+}
+
+public sealed class AnalystEntity
+{
+    public string Id { get; set; } = "";
+    public string ExternalId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Email { get; set; } = "";
+    public string Role { get; set; } = "";
+    public int AllocationPercentage { get; set; }
+    public string ProjectId { get; set; } = "";
+    public ProjectEntity Project { get; set; } = null!;
 }
 
 public sealed class ThresholdEntity

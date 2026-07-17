@@ -4,20 +4,20 @@ using Painel.Domain;
 
 namespace Painel.Application.UseCases;
 
-/// <summary>Casos de uso relacionados a projetos. Sem acoplamento a infra.</summary>
-public sealed class ProjectQueries(IErpClient erp, IThresholdRepository thresholds)
+/// <summary>Casos de uso relacionados a projetos. Lê do banco local (sincronizado do ERP).</summary>
+public sealed class ProjectQueries(IProjectRepository projectsRepo, IErpClient erp, IThresholdRepository thresholds)
 {
     public async Task<IReadOnlyList<ProjectSummaryDto>> ListAsync(CancellationToken ct = default)
     {
         var t = await thresholds.GetAsync(ct);
-        var projects = await erp.GetProjectsAsync(ct);
+        var projects = await projectsRepo.GetAllAsync(ct);
         var referenceDate = DateOnly.FromDateTime(DateTime.UtcNow);
         return projects.Select(p => Map(p, t, referenceDate)).ToList();
     }
 
     public async Task<ProjectDetailDto?> DetailAsync(string id, CancellationToken ct = default)
     {
-        var p = await erp.GetProjectAsync(id, ct);
+        var p = await projectsRepo.GetByIdAsync(id, ct);
         if (p is null) return null;
 
         var t = await thresholds.GetAsync(ct);
