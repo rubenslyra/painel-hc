@@ -10,6 +10,7 @@ using Painel.Infrastructure.Audit;
 using Painel.Infrastructure.Auth;
 using Painel.Infrastructure.Erp;
 using Painel.Infrastructure.Persistence;
+using Painel.Infrastructure.Sync;
 using Refit;
 using Serilog;
 
@@ -43,8 +44,12 @@ builder.Services.AddRefitClient<IRmApi>()
 // -------- Ports & Use Cases --------
 builder.Services.AddScoped<IErpClient, RefitErpClient>();
 builder.Services.AddScoped<IThresholdRepository, EfThresholdRepository>();
+builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();
 builder.Services.AddScoped<IAuditLog, DbAuditLog>();
 builder.Services.AddScoped<ProjectQueries>();
+
+// -------- Sincronização (startup) --------
+builder.Services.AddHostedService<ProjectSyncService>();
 
 // -------- JWT --------
 var jwt = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
@@ -85,7 +90,40 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PainelDbContext>();
-    if (db.Database.IsRelational()) db.Database.EnsureCreated();
+    if (db.Database.IsRelational())
+    {
+        db.Database.EnsureCreated();
+        db.Database.ExecuteSqlRaw("""
+            CREATE TABLE IF NOT EXISTS "Projects" (
+                "Id" text NOT NULL,
+                "ExternalId" text NOT NULL,
+                "Name" text NOT NULL,
+                "ClientId" text NOT NULL,
+                "ClientName" text NOT NULL,
+                "SoldHours" numeric NOT NULL,
+                "PlannedHours" numeric NOT NULL,
+                "WorkedHours" numeric NOT NULL,
+                "PhysicalProgressPercentage" numeric NOT NULL,
+                "StartDate" date NOT NULL,
+                "ExpectedEndDate" date NOT NULL,
+                "LastSynchronizedAt" timestamptz NOT NULL,
+                "LifecycleStatus" text NOT NULL,
+                CONSTRAINT "PK_Projects" PRIMARY KEY ("Id")
+            );
+            CREATE INDEX IF NOT EXISTS "IX_Projects_ExternalId" ON "Projects" ("ExternalId");
+            CREATE TABLE IF NOT EXISTS "Analysts" (
+                "Id" text NOT NULL,
+                "ExternalId" text NOT NULL,
+                "Name" text NOT NULL,
+                "Email" text NOT NULL,
+                "Role" text NOT NULL,
+                "AllocationPercentage" integer NOT NULL,
+                "ProjectId" text NOT NULL,
+                CONSTRAINT "PK_Analysts" PRIMARY KEY ("Id", "ProjectId"),
+                CONSTRAINT "FK_Analysts_Projects_ProjectId" FOREIGN KEY ("ProjectId") REFERENCES "Projects" ("Id") ON DELETE CASCADE
+            );
+            """);
+    }
 }
 
 app.UseSerilogRequestLogging();

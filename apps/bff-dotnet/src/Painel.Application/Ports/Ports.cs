@@ -20,3 +20,10 @@ public interface IAuditLog
 {
     Task RecordAsync(string userId, string action, string entity, string entityId, object? payload = null, CancellationToken ct = default);
 }
+
+public interface IProjectRepository
+{
+    Task<IReadOnlyList<Project>> GetAllAsync(CancellationToken ct = default);
+    Task<Project?> GetByIdAsync(string id, CancellationToken ct = default);
+    Task SaveAsync(IReadOnlyList<Project> projects, CancellationToken ct = default);
+}

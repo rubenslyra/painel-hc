@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     container_name: painel-hc-db
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-15432}:5432"
     environment:
       POSTGRES_USER: painel
       POSTGRES_PASSWORD: painel
@@ -16,6 +16,66 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  api-springboot:
+    build:
+      context: ./apps/api-springboot
+      dockerfile: Dockerfile
+    container_name: api-springboot
+    ports:
+      - "${SPRINGBOOT_HOST_PORT:-18082}:18082"
+    environment:
+      SERVER_PORT: 18082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://painel-hc-db:5432/painel_hc_rm
+      SPRING_DATASOURCE_USERNAME: painel
+      SPRING_DATASOURCE_PASSWORD: painel
+      RM_WEBHOOK_TARGET_URL: http://bff-dotnet:5080/api/v1/erp-webhooks/rm-events
+      RM_MOCK_SEED: ${RM_MOCK_SEED:-2026}
+      RM_MOCK_PROJECTS: ${RM_MOCK_PROJECTS:-20}
+      RM_MOCK_ANALYSTS: ${RM_MOCK_ANALYSTS:-48}
+      RM_MOCK_ENTRIES_PER_PROJECT: ${RM_MOCK_ENTRIES_PER_PROJECT:-36}
+    depends_on:
+      painel-hc-db:
+        condition: service_healthy
+
+  bff-dotnet:
+    build:
+      context: ./apps/bff-dotnet
+      dockerfile: Dockerfile
+    container_name: bff-dotnet
+    ports:
+      - "${BFF_HOST_PORT:-5080}:5080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://0.0.0.0:5080
+      ConnectionStrings__Painel: Host=painel-hc-db;Port=5432;Database=painel_hc_bff;Username=painel;Password=painel
+      Erp__BaseUrl: http://api-springboot:18082
+      Cors__Origins__0: ${CORS_ORIGIN:-http://localhost:4200}
+      Jwt__Issuer: ${JWT_ISSUER:-painel-bff}
+      Jwt__Audience: ${JWT_AUDIENCE:-painel-web}
+      Jwt__Secret: ${JWT_SECRET:-painel-hc-local-test-secret-32-bytes-minimum}
+      Jwt__AccessTokenMinutes: ${JWT_ACCESS_TOKEN_MINUTES:-15}
+      Jwt__RefreshTokenDays: ${JWT_REFRESH_TOKEN_DAYS:-7}
+    depends_on:
+      painel-hc-db:
+        condition: service_healthy
+      api-springboot:
+        condition: service_started
+
+  web-angular:
+    build:
+      context: ./apps/web-angular
+      dockerfile: Dockerfile
+    container_name: web-angular
+    ports:
+      - "${ANGULAR_HOST_PORT:-4200}:80"
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:5080/api/v1}
+      ERP_BASE_URL: ${ERP_BASE_URL:-}
+      SYNC_POLLING_MS: ${SYNC_POLLING_MS:-5000}
+    depends_on:
+      bff-dotnet:
+        condition: service_started
 
 volumes:
   pgdata:

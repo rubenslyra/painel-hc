@@ -135,9 +135,10 @@ popd
 exit /b %NPM_RC%
 
 :ensure_postgres_warning
-powershell -NoProfile -Command "try { $c=Test-NetConnection -ComputerName localhost -Port 5432 -InformationLevel Quiet; if (-not $c) { exit 1 } } catch { exit 1 }" >nul 2>nul
+if "%POSTGRES_HOST_PORT%"=="" set "POSTGRES_HOST_PORT=15432"
+powershell -NoProfile -Command "try { $c=Test-NetConnection -ComputerName localhost -Port %POSTGRES_HOST_PORT% -InformationLevel Quiet; if (-not $c) { exit 1 } } catch { exit 1 }" >nul 2>nul
 if errorlevel 1 (
-  echo Aviso: PostgreSQL nao respondeu em localhost:5432.
+  echo Aviso: PostgreSQL nao respondeu em localhost:%POSTGRES_HOST_PORT%.
   echo O ERP Mock usa PostgreSQL por padrao. Configure o banco painel_hc_rm com usuario painel/painel ou ajuste SPRING_DATASOURCE_*.
 )
 exit /b 0

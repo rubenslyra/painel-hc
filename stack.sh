@@ -116,14 +116,15 @@ ensure_npm_ci() {
 }
 
 ensure_postgres_warning() {
+  postgres_host_port="${POSTGRES_HOST_PORT:-15432}"
   if command -v nc >/dev/null 2>&1; then
-    nc -z localhost 5432 >/dev/null 2>&1 && return 0
+    nc -z localhost "$postgres_host_port" >/dev/null 2>&1 && return 0
   elif command -v pg_isready >/dev/null 2>&1; then
-    pg_isready -h localhost -p 5432 >/dev/null 2>&1 && return 0
+    pg_isready -h localhost -p "$postgres_host_port" >/dev/null 2>&1 && return 0
   else
     return 0
   fi
-  echo "Aviso: PostgreSQL nao respondeu em localhost:5432."
+  echo "Aviso: PostgreSQL nao respondeu em localhost:${postgres_host_port}."
   echo "O ERP Mock usa PostgreSQL por padrao. Configure o banco painel_hc_rm com usuario painel/painel ou ajuste SPRING_DATASOURCE_*."
 }
 
