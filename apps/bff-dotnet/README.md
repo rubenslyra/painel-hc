@@ -52,7 +52,7 @@ GET /api/v1/erp-webhooks/inbox
 Para usar PostgreSQL no BFF local:
 
 ```powershell
-$env:ConnectionStrings__Painel="Host=localhost;Port=5432;Database=painel_hc_bff;Username=painel;Password=painel"
+$env:ConnectionStrings__Painel="Host=localhost;Port=15432;Database=painel_hc_bff;Username=painel;Password=painel"
 ```
 ## Segurança
 - JWT (HS256) via `Microsoft.AspNetCore.Authentication.JwtBearer`.

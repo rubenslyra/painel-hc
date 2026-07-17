@@ -33,7 +33,7 @@ Se o health check responder `UP`, o BFF já pode consumir esta API externa.
 Por padrão, o ERP Mock usa PostgreSQL local:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/painel_hc_rm"
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:15432/painel_hc_rm"
 $env:SPRING_DATASOURCE_USERNAME="painel"
 $env:SPRING_DATASOURCE_PASSWORD="painel"
 ```
