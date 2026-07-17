@@ -1,5 +1,5 @@
 {
-  "apiBaseUrl": "${API_BASE_URL}",
-  "erpBaseUrl": "${ERP_BASE_URL}",
-  "syncPollingMs": ${SYNC_POLLING_MS}
+  "apiBaseUrl": "http://localhost:5080/api/v1",
+  "erpBaseUrl": "http://localhost:18082",
+  "syncPollingMs": 2000
 }
