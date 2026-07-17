@@ -45,5 +45,6 @@ apps/api-springboot/target/
 *.db
 *.sqlite
 *.sqlite3
+.run/
 .tmp/
 tmp/
