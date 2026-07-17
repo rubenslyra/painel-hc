@@ -44,10 +44,10 @@ services:
       dockerfile: Dockerfile
     container_name: bff-dotnet
     ports:
-      - "${BFF_HOST_PORT:-5080}:8080"
+      - "${BFF_HOST_PORT:-5080}:5080"
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
-      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ASPNETCORE_URLS: http://0.0.0.0:5080
       ConnectionStrings__Painel: Host=painel-hc-db;Port=5432;Database=painel_hc_bff;Username=painel;Password=painel
       Erp__BaseUrl: http://api-springboot:18082
       Cors__Origins__0: ${CORS_ORIGIN:-http://localhost:4200}
